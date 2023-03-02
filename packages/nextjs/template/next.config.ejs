@@ -10,9 +10,6 @@ const customNextConfig = require('./config/next.config.js')
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    <%_ if (customNextConfig) { _%>
-    ...customNextConfig,
-    <%_ } _%>
     env: {
         TARO_ENV: 'h5',
     <%_ if (env) {
@@ -37,6 +34,9 @@ const nextConfig = {
     transpilePackages: [
       'taro-ui'
     ],
+    <%_ if (customNextConfig) { _%>
+    ...customNextConfig,
+    <%_ } _%>
     webpack(config, options) {
         const {isServer, webpack} = options
 
@@ -65,7 +65,7 @@ const nextConfig = {
             if (plugin.constructor.name === 'DefinePlugin') {
                 config.plugins[i] = new webpack.DefinePlugin({
                     <%_ Object.keys(defineConstants).forEach(function (key) { _%>
-                    <%- JSON.stringify(key) -%>: <%- defineConstants[key] %>,
+                    <%- JSON.stringify(key) -%>: <%- JSON.stringify(defineConstants[key]) %>,
                     <%_ }) _%>
                     ...plugin.definitions
                 })
