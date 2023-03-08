@@ -24,18 +24,23 @@ registerToastComponent(Toast)
 registerModalComponent(Modal)
 registerPreviewComponent(Preview)
 
-const MyApp = ({Component, pageProps}) => (
-    <>
-        <Head>
-            <meta
-                name="viewport"
-                content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"
-            />
-        </Head>
-        <TaroApp>
-            <Component {...pageProps} />
-        </TaroApp>
-    </>
-)
+const MyApp = props => {
+    const { Component, pageProps } = props;
+    const getLayout = Component.getLayout ?? ((page) => page)
+
+    return (
+        <>
+            <Head>
+                <meta
+                    name="viewport"
+                    content="width=device-width,initial-scale=1,user-scalable=no,viewport-fit=cover"
+                />
+            </Head>
+            <TaroApp {...props}>
+                {getLayout(<Component {...pageProps} />)}
+            </TaroApp>
+        </>
+    )
+}
 
 export default MyApp

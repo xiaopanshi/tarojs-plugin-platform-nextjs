@@ -168,7 +168,7 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
 
                         contents = unIndent`
                             import {TaroPage} from 'tarojs-plugin-platform-nextjs/taro'
-                            import Page from '${modulePath}'
+                            import Page, { getLayout } from '${modulePath}'
                             
                             const pageConfig = {
                                 backgroundColor: ${JSON.stringify(pageConfig.backgroundColor)}
@@ -177,15 +177,19 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
                             export default function NextPage(props) {
                                 return <TaroPage {...props} Page={Page} pageConfig={pageConfig} />
                             }
+
+                            NextPage.getLayout = getLayout
                         `
                     } else {
                         contents = unIndent`
                             import {TaroPage} from 'tarojs-plugin-platform-nextjs/taro'
-                            import Page from '${modulePath}'
+                            import Page, { getLayout } from '${modulePath}'
 
                             export default function NextPage(props) {
                                 return <TaroPage {...props} Page={Page} />
                             }
+
+                            NextPage.getLayout = getLayout
                         `
                     }
                     if (exportedFunctions.length) {
@@ -252,6 +256,7 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
                         .pipe(dest(path.join(outputPath, 'pages'))),
                     src(`${templateDir}/pages/_document.jsx`).pipe(dest(path.join(outputPath, 'pages'))),
                     src(`${appPath}/config/**`).pipe(dest(path.join(outputPath, 'config'))),
+                    src(`${appPath}/middleware.*`).pipe(dest(path.join(outputPath))),
                     src(`${templateDir}/next.config.ejs`)
                         .pipe(es.through(function (data) {
                             const dynamicPages = nextPageInfos

@@ -27,17 +27,17 @@ Minify by terser:
 })(window, document);
 ```
  */
-const REM_SCRIPT = '!function(n,e){var t=e.documentElement;function d(){var n=t.clientWidth;t.style.fontSize=n>=640?"40px":n<=320?"20px":n/320*20+"px"}n.addEventListener("resize",d),n.addEventListener("DOMContentLoaded",d)}(window,document)';
+// const REM_SCRIPT = '!function(n,e){var t=e.documentElement;function d(){var n=t.clientWidth;t.style.fontSize=n>=640?"40px":n<=320?"20px":n/320*20+"px"}n.addEventListener("resize",d),n.addEventListener("DOMContentLoaded",d)}(window,document)';
 
-const CONTAINER_STYLE = '#__next{max-width: 640px;margin: 0 auto;}'
+// const CONTAINER_STYLE = '#__next{max-width: 640px;margin: 0 auto;}'
 
 export default class MyDocument extends Document {
     render() {
         return (
             <Html>
                 <Head>
-                    <style type='text/css' dangerouslySetInnerHTML={{__html: CONTAINER_STYLE}} />
-                    <script dangerouslySetInnerHTML={{__html: REM_SCRIPT}} />
+                    {/* <style type='text/css' dangerouslySetInnerHTML={{__html: CONTAINER_STYLE}} />
+                    <script dangerouslySetInnerHTML={{__html: REM_SCRIPT}} /> */}
                 </Head>
                 <body>
                     <Main />
