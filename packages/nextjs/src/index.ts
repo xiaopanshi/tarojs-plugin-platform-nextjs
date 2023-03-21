@@ -168,7 +168,7 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
 
                         contents = unIndent`
                             import {TaroPage} from 'tarojs-plugin-platform-nextjs/taro'
-                            import Page, { getLayout } from '${modulePath}'
+                            import Page from '${modulePath}'
                             
                             const pageConfig = {
                                 backgroundColor: ${JSON.stringify(pageConfig.backgroundColor)}
@@ -178,18 +178,20 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
                                 return <TaroPage {...props} Page={Page} pageConfig={pageConfig} />
                             }
 
-                            NextPage.getLayout = getLayout
+                            NextPage.getInitialProps = Page.getInitialProps
+                            NextPage.getLayout = Page.getLayout
                         `
                     } else {
                         contents = unIndent`
                             import {TaroPage} from 'tarojs-plugin-platform-nextjs/taro'
-                            import Page, { getLayout } from '${modulePath}'
+                            import Page from '${modulePath}'
 
                             export default function NextPage(props) {
                                 return <TaroPage {...props} Page={Page} />
                             }
 
-                            NextPage.getLayout = getLayout
+                            NextPage.getInitialProps = Page.getInitialProps
+                            NextPage.getLayout = Page.getLayout
                         `
                     }
                     if (exportedFunctions.length) {

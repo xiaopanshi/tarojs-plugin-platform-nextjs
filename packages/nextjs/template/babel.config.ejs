@@ -1,4 +1,30 @@
+const nextConfig = require('./next.config')
+
+const plugins = []
+const imports = nextConfig.modularizeImports
+let hasBabelImport = false
+try {
+  require('babel-plugin-import')
+  hasBabelImport = true
+} catch(e) {}
+
+if (imports && hasBabelImport) {
+
+  Object.keys(imports).forEach(lib => {
+    const style = imports[lib].style
+    const transform = imports[lib].transform || ''
+    const customName = imports[lib].customName
+    const camel2DashComponentName = imports[lib].camel2DashComponentName
+    const lastIndex = transform.lastIndexOf('/')
+    const libraryDirectory = customName ? null : transform.slice(lib.length + 1, lastIndex)
+    plugins.push(
+      ['import', { 'libraryName': lib, libraryDirectory: libraryDirectory, style: style, customName: customName, camel2DashComponentName: camel2DashComponentName }]
+    )
+  })
+}
+
 module.exports = {
+    plugins,
     presets: [
         ['tarojs-plugin-platform-nextjs/babel/after', {
             <%_ if (taroPages) { _%>
