@@ -34,13 +34,14 @@ const Preview: React.FC<PreviewProps> = ({defaultCurrent, urls, onClose}) => {
             <Swiper
                 className='taro-preview_swiper'
                 current={current}
-                onChange={event => {
+                onChange={(event: any) => {
                     setCurrent(event.detail.current)
                 }}
             >
                 {urls.map((url, index) => (
                     <SwiperItem
                         key={`${index}_${url}`}
+                        itemId={`${index}_${url}`}
                         className='taro-preview_swiper-item'
                     >
                         <img className='taro-preview_img' src={url} />

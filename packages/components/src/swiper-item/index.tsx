@@ -1,32 +1,23 @@
 import React from 'react'
 import classNames from 'classnames'
-import useTaroBaseEvents from '../_util/hooks/useTaroBaseEvents'
-import {TaroBaseProps} from '../_util/typings'
 
-export interface SwiperItemProps extends TaroBaseProps {
-    /**
-     * 该 swiper-item 的标识符
-     */
-    itemId?: string
-
-    /**
-     * 内容
-     */
-    children?: React.ReactNode
+export interface SwiperItemProps extends React.HTMLAttributes<HTMLDivElement> {
+    itemId: string
 }
 
-const SwiperItem: React.FC<SwiperItemProps> = ({className, itemId, children, ...rest}) => {
-    const props = useTaroBaseEvents(rest)
-
-    return (
+export default class SwiperItem extends React.Component<SwiperItemProps, Record<string, unknown>> {
+    render () {
+        const { className, style, itemId, children, ...restProps } = this.props
+        const cls = classNames('swiper-slide', className)
+        return (
         <div
-            key={itemId}
-            className={classNames('swiper-slide', className)}
-            {...props}
+            className={cls}
+            style={style}
+            item-id={itemId}
+            {...restProps}
         >
             {children}
         </div>
-    )
+        )
+    }
 }
-
-export default SwiperItem

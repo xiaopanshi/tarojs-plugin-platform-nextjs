@@ -1,11 +1,21 @@
 let withLess = false
 let reported = false
+const configChain = []
 try {
     withLess = require('next-with-less')
-} catch (err) {
-}
+    configChain.push(withLess);
+} catch (err) {}
+
+const compose = (fns) => x => fns.reduceRight((v, f) => f(v), x);
 <%_ if (customNextConfig) { _%>
-const customNextConfig = require('./config/next.config.js')
+const customNextConfig = require('./config/next.config.js');
+
+if (customNextConfig.transpilePackages && customNextConfig.transpilePackages.length) {
+    try {
+        const withTM = require('next-transpile-modules')
+        configChain.push(withTM(customNextConfig.transpilePackages))
+    } catch (err) {}
+}
 <%_ } _%>
 
 /** @type {import('next').NextConfig} */
@@ -31,9 +41,31 @@ const nextConfig = {
     eslint: {
         ignoreDuringBuilds: true
     },
-    transpilePackages: [
-      'taro-ui'
-    ],
+    <%_ if (rewrites) { _%>
+    async rewrites() {
+        return {
+            beforeFiles:  [
+            <%_ rewrites.forEach(function (rewrite) { _%>
+                {
+                    source: <%- JSON.stringify(rewrite.source) %>,
+                    <%_ if (rewrite.has) { _%>
+                    has: [
+                        <% rewrite.has.forEach(function (item) { %>
+                        {
+                            type: <%- JSON.stringify(item.type) %>,
+                            key: <%- JSON.stringify(item.key) %>,
+                            value: <%- JSON.stringify(item.value) %>
+                        },
+                        <% }) %>
+                    ],
+                    <%_ } _%>
+                    destination: <%- JSON.stringify(rewrite.destination) %>
+                },
+            <%_ }) _%>
+            ]
+        }
+    },
+    <%_ } _%>
     <%_ if (customNextConfig) { _%>
     ...customNextConfig,
     <%_ } _%>
@@ -80,31 +112,6 @@ const nextConfig = {
         <%_ } _%>
         return config
     },
-    <%_ if (rewrites) { _%>
-    async rewrites() {
-        return {
-            beforeFiles:  [
-            <%_ rewrites.forEach(function (rewrite) { _%>
-                {
-                    source: <%- JSON.stringify(rewrite.source) %>,
-                    <%_ if (rewrite.has) { _%>
-                    has: [
-                        <% rewrite.has.forEach(function (item) { %>
-                        {
-                            type: <%- JSON.stringify(item.type) %>,
-                            key: <%- JSON.stringify(item.key) %>,
-                            value: <%- JSON.stringify(item.value) %>
-                        },
-                        <% }) %>
-                    ],
-                    <%_ } _%>
-                    destination: <%- JSON.stringify(rewrite.destination) %>
-                },
-            <%_ }) _%>
-            ]
-        }
-    }
-    <%_ } _%>
 }
 
-module.exports = withLess ? withLess(nextConfig) : nextConfig
+module.exports = compose(configChain)(nextConfig)

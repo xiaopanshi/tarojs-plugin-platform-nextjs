@@ -168,7 +168,7 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
 
                         contents = unIndent`
                             import {TaroPage} from 'tarojs-plugin-platform-nextjs/taro'
-                            import Page, { getLayout } from '${modulePath}'
+                            import Page from '${modulePath}'
                             
                             const pageConfig = {
                                 backgroundColor: ${JSON.stringify(pageConfig.backgroundColor)}
@@ -178,18 +178,20 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
                                 return <TaroPage {...props} Page={Page} pageConfig={pageConfig} />
                             }
 
-                            NextPage.getLayout = getLayout
+                            NextPage.getInitialProps = Page.getInitialProps
+                            NextPage.getLayout = Page.getLayout
                         `
                     } else {
                         contents = unIndent`
                             import {TaroPage} from 'tarojs-plugin-platform-nextjs/taro'
-                            import Page, { getLayout } from '${modulePath}'
+                            import Page from '${modulePath}'
 
                             export default function NextPage(props) {
                                 return <TaroPage {...props} Page={Page} />
                             }
 
-                            NextPage.getLayout = getLayout
+                            NextPage.getInitialProps = Page.getInitialProps
+                            NextPage.getLayout = Page.getLayout
                         `
                     }
                     if (exportedFunctions.length) {
@@ -254,7 +256,18 @@ export default (ctx: IPluginContext, pluginOpts: PluginOptions) => {
                         }))
                         .pipe(rename('_app.jsx'))
                         .pipe(dest(path.join(outputPath, 'pages'))),
-                    src(`${templateDir}/pages/_document.jsx`).pipe(dest(path.join(outputPath, 'pages'))),
+                    src(`${templateDir}/pages/_document.ejs`)
+                    .pipe(es.through(function (data) {
+                        const ejsData = {
+                            pxtransformEnable: postcss.pxtransform?.enable !== false
+                        }
+                        const result = ejs.render(data.contents.toString(), ejsData)
+                        data.contents = Buffer.from(result)
+
+                        this.emit('data', data)
+                    }))
+                    .pipe(rename('_document.jsx'))
+                    .pipe(dest(path.join(outputPath, 'pages'))),
                     src(`${appPath}/config/**`).pipe(dest(path.join(outputPath, 'config'))),
                     src(`${appPath}/middleware.*`).pipe(dest(path.join(outputPath))),
                     src(`${templateDir}/next.config.ejs`)
