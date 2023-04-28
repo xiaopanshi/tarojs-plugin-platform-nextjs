@@ -26,7 +26,7 @@ registerPreviewComponent(Preview)
 
 const MyApp = props => {
     const { Component, pageProps } = props;
-    const getLayout = Component.getLayout ?? ((page) => page)
+    const getLayout = Component.getLayout || ((page) => page)
 
     return (
         <>
@@ -37,7 +37,7 @@ const MyApp = props => {
                 />
             </Head>
             <TaroApp {...props}>
-                {getLayout(<Component {...pageProps} />)}
+                {getLayout(<Component {...pageProps} />, pageProps)}
             </TaroApp>
         </>
     )
